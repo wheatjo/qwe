@@ -27,10 +27,17 @@ class Detector(object):
 
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
-
+        '''
         print('Restoring weights from: ' + self.weights_file)
         self.saver = tf.train.Saver()
         self.saver.restore(self.sess, self.weights_file)
+        '''
+        '''
+        self.saver = tf.train.import_meta_graph('yolo.ckpt-3000.meta')
+        self.saver.restore(self.sess, tf.train.latest_checkpoint('./data/pas_real/output/2019_01_24_17_00/'))
+        '''
+        self.saver = tf.train.import_meta_graph('./data/pas_real/output/2019_01_25_01_36/yolo-2000.meta')
+        self.saver.restore(self.sess, './data/pas_real/output/2019_01_25_01_36/yolo-2000')
 
     def draw_result(self, img, result):
         for i in range(len(result)):
@@ -180,6 +187,7 @@ class Detector(object):
             detect_timer.average_time))
 
         self.draw_result(image, result)
+        cv2.namedWindow('Image', 0)
         cv2.imshow('Image', image)
         cv2.waitKey(wait)
 
@@ -189,7 +197,7 @@ def main():
     parser.add_argument('--weights', default="YOLO_small.ckpt", type=str)
     parser.add_argument('--weight_dir', default='weights', type=str)
     parser.add_argument('--data_dir', default="data", type=str)
-    parser.add_argument('--gpu', default='', type=str)
+    parser.add_argument('--gpu', default='0', type=str)
     args = parser.parse_args()
 
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
@@ -203,7 +211,8 @@ def main():
     # detector.camera_detector(cap)
 
     # detect from image file
-    imname = 'test/person.jpg'
+    #imname = "test/box1.jpg"
+    imname = "./data/pas_real/VOCdevkit/VOC2007/JPEGImages/000034.jpg"
     detector.image_detector(imname)
 
 
